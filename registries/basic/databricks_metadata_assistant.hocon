@@ -1,0 +1,241 @@
+{
+    include "registries/aaosa.hocon",
+
+    "metadata": {
+        "description": "Databricks Metadata Assistant",
+        "tags": [
+            "Databricks",
+            "Unity Catalog",
+            "Metadata",
+            "Data Engineering"
+        ],
+        "sample_queries": [
+            "List all catalogs",
+            "Show schemas in main catalog",
+            "List tables in main default schema",
+            "Show columns in customer table",
+            "Describe customer_master table"
+        ]
+    },
+
+    include "config/llm_config.hocon",
+
+    "instructions_prefix": """
+    You are a Databricks Metadata Assistant.
+
+    Help users discover:
+    - Catalogs
+    - Schemas
+    - Tables
+    - Columns
+
+    Always use your metadata tools.
+    Never invent metadata.
+    """
+
+    "tools": [
+
+        {
+            "name": "Databricks_Metadata_Agent",
+
+            "function": {
+                "description": """
+                Top level Databricks metadata assistant.
+                """
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "type": "string",
+                            "description": "User metadata request"
+                        }
+                    },
+                    "required": ["query"]
+                }
+            },
+
+            "instructions": ${instructions_prefix} """
+            Route requests as follows:
+
+            Catalog questions -> Catalog_Agent
+            Schema questions -> Schema_Agent
+            Table questions -> Table_Agent
+            Column questions -> Column_Agent
+
+            Combine responses into a natural language answer.
+            """ ${aaosa_instructions},
+
+            "tools": [
+                "Catalog_Agent",
+                "Schema_Agent",
+                "Table_Agent",
+                "Column_Agent"
+            ]
+        },
+
+        {
+            "name": "Catalog_Agent",
+
+            "function": ${aaosa_call}{
+                "description": """
+                Handles catalog discovery.
+                """
+            },
+
+            "instructions": """
+            Return available catalogs and descriptions.
+            """ ${aaosa_instructions},
+
+            "tools": [
+                "CatalogDiscoveryTool"
+            ]
+        },
+
+        {
+            "name": "Schema_Agent",
+
+            "function": ${aaosa_call}{
+                "description": """
+                Handles schema discovery.
+                """
+            },
+
+            "instructions": """
+            Return schemas for a given catalog.
+            """ ${aaosa_instructions},
+
+            "tools": [
+                "SchemaDiscoveryTool"
+            ]
+        },
+
+        {
+            "name": "Table_Agent",
+
+            "function": ${aaosa_call}{
+                "description": """
+                Handles table discovery.
+                """
+            },
+
+            "instructions": """
+            Return tables and views for a schema.
+            """ ${aaosa_instructions},
+
+            "tools": [
+                "TableDiscoveryTool"
+            ]
+        },
+
+        {
+            "name": "Column_Agent",
+
+            "function": ${aaosa_call}{
+                "description": """
+                Handles column discovery.
+                """
+            },
+
+            "instructions": """
+            Return column names, types and comments.
+            """ ${aaosa_instructions},
+
+            "tools": [
+                "ColumnDiscoveryTool"
+            ]
+        },
+
+        {
+            "name": "CatalogDiscoveryTool",
+
+            "function": {
+                "description": "Returns Databricks catalogs"
+                "parameters": {
+                    "type": "object",
+                    "properties": {}
+                }
+            },
+
+            "class": "Catalog_Discovery_Tool.CatalogDiscoveryTool"
+        },
+
+        {
+            "name": "SchemaDiscoveryTool",
+
+            "function": {
+                "description": "Returns schemas for a catalog"
+
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "catalog": {
+                            "type": "string",
+                            "description": "Databricks catalog name"
+                        }
+                    },
+                    "required": [
+                        "catalog"
+                    ]
+                }
+            },
+
+            "class": "Schema_Discovery.SchemaDiscoveryTool"
+        },
+
+        {
+            "name": "TableDiscoveryTool",
+
+            "function": {
+                "description": "Returns tables for a schema"
+
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "catalog": {
+                            "type": "string"
+                        },
+                        "schema_name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "catalog",
+                        "schema_name"
+                    ]
+                }
+            },
+
+            "class": "Table_Discovery.TableDiscoveryTool"
+        },
+
+        {
+            "name": "ColumnDiscoveryTool",
+
+            "function": {
+                "description": "Returns table column metadata"
+
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "catalog": {
+                            "type": "string"
+                        },
+                        "schema_name": {
+                            "type": "string"
+                        },
+                        "table": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "catalog",
+                        "schema_name",
+                        "table"
+                    ]
+                }
+            },
+
+            "class": "Column_Discovery.ColumnDiscoveryTool"
+        }
+    ]
+}

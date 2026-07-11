@@ -1,5 +1,6 @@
 {
     include "registries/aaosa_basic.hocon"
+    include "config/llm_config.hocon"
 
     "metadata": {
         "description": "Multi-agent Spark Learning Assistant",
