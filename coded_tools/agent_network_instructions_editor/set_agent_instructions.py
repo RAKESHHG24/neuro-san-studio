@@ -35,7 +35,7 @@ class SetAgentInstructions(CodedTool):
     - a list of down-chain agents (agents reporting to it)
     """
 
-    async def async_invoke(self, args: dict[str, Any], sly_data: dict[str, Any]) -> str:
+    (self, args: dict[str, Any], sly_data: dict[str, Any]) -> str:
         """
         :param args: An argument dictionary whose keys are the parameters
                 to the coded tool and whose values are the values passed for them

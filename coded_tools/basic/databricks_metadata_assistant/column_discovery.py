@@ -1,7 +1,7 @@
 import os
 
 from neuro_san.interfaces.coded_tool import CodedTool
-from .Custom_Databricks_Tool import execute_query
+from .custom_databricks_tool import execute_query
 
 
 class ColumnDiscoveryTool(CodedTool):

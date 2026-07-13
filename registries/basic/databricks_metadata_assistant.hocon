@@ -1,6 +1,6 @@
 {
-    include "registries/aaosa.hocon",
-
+    include "registries/aaosa.hocon"
+    include "config/llm_config.hocon"
     "metadata": {
         "description": "Databricks Metadata Assistant",
         "tags": [
@@ -87,7 +87,7 @@
             """ ${aaosa_instructions},
 
             "tools": [
-                "CatalogDiscoveryTool"
+                "CatalogDiscoveryAPI"
             ]
         },
 
@@ -105,7 +105,7 @@
             """ ${aaosa_instructions},
 
             "tools": [
-                "SchemaDiscoveryTool"
+                "SchemaDiscoveryAPI"
             ]
         },
 
@@ -123,7 +123,7 @@
             """ ${aaosa_instructions},
 
             "tools": [
-                "TableDiscoveryTool"
+                "TableDiscoveryAPI"
             ]
         },
 
@@ -141,26 +141,23 @@
             """ ${aaosa_instructions},
 
             "tools": [
-                "ColumnDiscoveryTool"
+                "ColumnDiscoveryAPI"
             ]
         },
 
         {
-            "name": "CatalogDiscoveryTool",
+            "name": "CatalogDiscoveryAPI",
 
             "function": {
                 "description": "Returns Databricks catalogs"
-                "parameters": {
-                    "type": "object",
-                    "properties": {}
-                }
+                
             },
 
-            "class": "Catalog_Discovery_Tool.CatalogDiscoveryTool"
+            "class": "basic.databricks_metadata_assistant.catalog_discovery_tool.CatalogDiscoveryTool"
         },
 
         {
-            "name": "SchemaDiscoveryTool",
+            "name": "SchemaDiscoveryAPI",
 
             "function": {
                 "description": "Returns schemas for a catalog"
@@ -179,11 +176,11 @@
                 }
             },
 
-            "class": "Schema_Discovery.SchemaDiscoveryTool"
+            "class": "basic.databricks_metadata_assistant.schema_discovery.SchemaDiscoveryTool"
         },
 
         {
-            "name": "TableDiscoveryTool",
+            "name": "TableDiscoveryAPI",
 
             "function": {
                 "description": "Returns tables for a schema"
@@ -205,11 +202,11 @@
                 }
             },
 
-            "class": "Table_Discovery.TableDiscoveryTool"
+            "class": "basic.databricks_metadata_assistant.table_discovery.TableDiscoveryTool"
         },
 
         {
-            "name": "ColumnDiscoveryTool",
+            "name": "ColumnDiscoveryAPI",
 
             "function": {
                 "description": "Returns table column metadata"
@@ -235,7 +232,7 @@
                 }
             },
 
-            "class": "Column_Discovery.ColumnDiscoveryTool"
+            "class": "basic.databricks_metadata_assistant.column_discovery.ColumnDiscoveryTool"
         }
     ]
 }

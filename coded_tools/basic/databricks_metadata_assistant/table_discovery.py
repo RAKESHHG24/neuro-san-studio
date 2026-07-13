@@ -1,5 +1,5 @@
 from neuro_san.interfaces.coded_tool import CodedTool
-from .Custom_Databricks_Tool import get_workspace
+from .custom_databricks_tool import get_workspace
 
 
 class TableDiscoveryTool(CodedTool):

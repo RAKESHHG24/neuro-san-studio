@@ -1,13 +1,13 @@
 from neuro_san.interfaces.coded_tool import CodedTool
-from .Custom_Databricks_Tool import get_workspace
+from .custom_databricks_tool import get_workspace
 
 
 class CatalogDiscoveryTool(CodedTool):
 
     def invoke(self, args, sly_data):
 
-        print("===== CatalogDiscoveryTool INVOKED =====")
-        print("ARGS:", args)
+        print("===== CatalogDiscoveryTool invoked =====")
+        print(f"args={args}")
 
         w = get_workspace()
 
@@ -19,4 +19,5 @@ class CatalogDiscoveryTool(CodedTool):
                 "comment": c.comment
             })
 
+        print("Returning catalogs")
         return catalogs
