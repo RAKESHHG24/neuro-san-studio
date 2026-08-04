@@ -69,7 +69,8 @@
                 "Catalog_Agent",
                 "Schema_Agent",
                 "Table_Agent",
-                "Column_Agent"
+                "Column_Agent",
+                "QueryExecutorAPI"
             ]
         },
 
@@ -233,6 +234,29 @@
             },
 
             "class": "basic.databricks_metadata_assistant.column_discovery.ColumnDiscoveryTool"
+        },
+
+        {
+            "name": "QueryExecutorAPI",
+
+            "function": {
+                "description": "Executes a SQL query against Databricks and returns the resulting rows"
+
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "sql_query": {
+                            "type": "string",
+                            "description": "The SQL query to execute"
+                        }
+                    },
+                    "required": [
+                        "sql_query"
+                    ]
+                }
+            },
+
+            "class": "basic.databricks_metadata_assistant.query_executor.QueryExecutorTool"
         }
     ]
 }
