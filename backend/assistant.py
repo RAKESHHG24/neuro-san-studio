@@ -68,7 +68,7 @@ def _build_preview_sql(question: str) -> str | None:
     if lower_q.startswith("select "):
         return stripped
 
-    if not re.search(r"\b(sample|records?|rows?|top|first|show|preview)\b", lower_q):
+    if not re.search(r"\b(sample|records?|rows?|top|first|show|preview|count|how many|number of)\b", lower_q):
         return None
 
     pattern = re.compile(
@@ -82,6 +82,15 @@ def _build_preview_sql(question: str) -> str | None:
     table = match.group("table")
     catalog = match.group("catalog")
     schema = match.group("schema")
+
+    is_count_intent = bool(
+        re.search(r"\b(count|how many|number of)\b", lower_q)
+        and re.search(r"\b(records?|rows?)\b", lower_q)
+    )
+
+    if is_count_intent:
+        return f"SELECT COUNT(*) AS record_count FROM {catalog}.{schema}.{table}"
+
     limit = _extract_limit(stripped)
 
     return f"SELECT * FROM {catalog}.{schema}.{table} LIMIT {limit}"
