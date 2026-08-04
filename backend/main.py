@@ -2,7 +2,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from .assistant import ask_agent
+try:
+    from .assistant import ask_agent
+except ImportError:  # pragma: no cover - allows running as `python main.py` or `uvicorn main:app`
+    from assistant import ask_agent
 
 app = FastAPI(title="Assistant API")
 
@@ -19,7 +22,7 @@ class QueryRequest(BaseModel):
     question: str
 
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def health() -> dict:
     return {"status": "ok"}
 
