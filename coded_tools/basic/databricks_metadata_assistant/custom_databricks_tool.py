@@ -71,6 +71,28 @@ def execute_query(query):
                 continue
             data_rows.append(row)
 
+    status_obj = getattr(result, "status", None)
+    status = getattr(status_obj, "state", None)
+    if status is not None:
+        try:
+            status = str(status)
+        except Exception:  # pylint: disable=broad-except
+            status = repr(status)
+
+    error_summary = None
+
+    if hasattr(result, "error") and getattr(result, "error") is not None:
+        error_summary = str(getattr(result, "error"))
+    elif status_obj is not None and hasattr(status_obj, "error") and getattr(status_obj, "error") is not None:
+        error_summary = str(getattr(status_obj, "error"))
+
+    if status == "FAILED" or error_summary:
+        return {
+            "status": status,
+            "error": error_summary or "SQL statement failed without an error message.",
+            "statement_id": getattr(result, "statement_id", None),
+        }
+
     if columns and data_rows:
         return {
             "columns": columns,
@@ -80,6 +102,6 @@ def execute_query(query):
 
     return {
         "statement_id": getattr(result, "statement_id", None),
-        "status": getattr(getattr(result, "status"), "state", None),
+        "status": status,
         "manifest": getattr(result, "manifest", None),
     }
