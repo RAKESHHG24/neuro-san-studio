@@ -1,6 +1,6 @@
 {
-    include "registries/aaosa.hocon"
-    include "config/llm_config.hocon"
+    include "/workspaces/neuro-san-studio/registries/aaosa.hocon"
+    include "/workspaces/neuro-san-studio/config/llm_config.hocon"
     "metadata": {
         "description": "Databricks Metadata Assistant",
         "tags": [
@@ -14,23 +14,33 @@
             "Show schemas in main catalog",
             "List tables in main default schema",
             "Show columns in customer table",
-            "Describe customer_master table"
+            "Describe customer_master table",
+            "Show 5 rows from test123.filestore.customers_bronze"
         ]
     },
 
-    include "config/llm_config.hocon",
+    include "/workspaces/neuro-san-studio/config/llm_config.hocon",
 
     "instructions_prefix": """
     You are a Databricks Metadata Assistant.
 
-    Help users discover:
+    Help users with Databricks metadata and SQL results.
+
+    Metadata discovery:
     - Catalogs
     - Schemas
     - Tables
     - Columns
 
-    Always use your metadata tools.
-    Never invent metadata.
+    Query execution:
+    - Build SQL for data-preview and analytic questions.
+    - Use QueryExecutorAPI for SQL execution.
+
+    Rules:
+    - Always use tools; do not answer from memory.
+    - Never invent metadata or query results.
+    - If the user asks for records/rows/sample/top/preview, execute SQL and return rows.
+    - Use metadata tools only when they are needed to answer a metadata request or to disambiguate missing names.
     """
 
     "tools": [
@@ -61,6 +71,14 @@
             Schema questions -> Schema_Agent
             Table questions -> Table_Agent
             Column questions -> Column_Agent
+            Data preview / SQL / analytics questions -> QueryExecutorAPI
+
+            For requests like "show sample rows", "top N rows", "select ... from ...", or "count from table":
+            - Build a valid Databricks SQL query.
+            - Prefer fully-qualified names catalog.schema.table when provided.
+            - Apply LIMIT when user asks for samples.
+            - Call QueryExecutorAPI with sql_query only.
+            - Do not call Catalog_Agent first unless catalog/schema/table values are missing.
 
             Combine responses into a natural language answer.
             """ ${aaosa_instructions},
@@ -155,7 +173,7 @@
                 
             },
 
-            "class": "basic.databricks_metadata_assistant.catalog_discovery_tool.CatalogDiscoveryTool"
+            "class": "coded_tools.basic.databricks_metadata_assistant.catalog_discovery_tool.CatalogDiscoveryTool"
         },
 
         {
@@ -178,7 +196,7 @@
                 }
             },
 
-            "class": "basic.databricks_metadata_assistant.schema_discovery.SchemaDiscoveryTool"
+            "class": "coded_tools.basic.databricks_metadata_assistant.schema_discovery.SchemaDiscoveryTool"
         },
 
         {
@@ -204,7 +222,7 @@
                 }
             },
 
-            "class": "basic.databricks_metadata_assistant.table_discovery.TableDiscoveryTool"
+            "class": "coded_tools.basic.databricks_metadata_assistant.table_discovery.TableDiscoveryTool"
         },
 
         {
@@ -234,7 +252,7 @@
                 }
             },
 
-            "class": "basic.databricks_metadata_assistant.column_discovery.ColumnDiscoveryTool"
+            "class": "coded_tools.basic.databricks_metadata_assistant.column_discovery.ColumnDiscoveryTool"
         },
 
         {
@@ -257,7 +275,7 @@
                 }
             },
 
-            "class": "basic.databricks_metadata_assistant.query_executor.QueryExecutorTool"
+            "class": "coded_tools.basic.databricks_metadata_assistant.query_executor.QueryExecutorTool"
         },
 
         {
@@ -288,7 +306,7 @@
                 }
             },
 
-            "class": "basic.databricks_metadata_assistant.export_results.ExportResultsTool"
+            "class": "coded_tools.basic.databricks_metadata_assistant.export_results.ExportResultsTool"
         }
     ]
 }

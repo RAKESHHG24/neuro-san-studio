@@ -6,16 +6,43 @@ function App() {
   const [loading, setLoading] = useState(false);
 
   const askAssistant = async () => {
-    setLoading(true);
-    const response = await fetch('/api/ask', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question }),
-    });
+    if (!question.trim()) {
+      setAnswer('Please enter a question.');
+      return;
+    }
 
-    const data = await response.json();
-    setAnswer(data.answer || 'No response');
-    setLoading(false);
+    setLoading(true);
+    setAnswer('');
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+    try {
+      const response = await fetch('/api/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question }),
+        signal: controller.signal,
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setAnswer(data.detail || `Request failed (${response.status}).`);
+        return;
+      }
+
+      setAnswer(data.answer || 'No response');
+    } catch (error) {
+      if (error?.name === 'AbortError') {
+        setAnswer('Request timed out. Please try again.');
+      } else {
+        setAnswer('Unable to reach backend. Check server/proxy status.');
+      }
+    } finally {
+      clearTimeout(timeoutId);
+      setLoading(false);
+    }
   };
 
   return (
