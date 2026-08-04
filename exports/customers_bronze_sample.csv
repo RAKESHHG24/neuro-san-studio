@@ -1,0 +1,7 @@
+customer_id,name,email,city,status,event_time,op,_rescued_data,ingest_ts
+1,Alice,a@example.com,Bengaluru,active,2024-01-01T09:00:00.000Z,I,,2026-03-09T16:59:02.457Z
+2,Bob,b@example.com,Hyderabad,active,2024-01-01T10:00:00.000Z,I,,2026-03-09T16:59:02.457Z
+3,Carol,c@example.com,Delhi,inactive,2024-01-01T11:00:00.000Z,I,,2026-03-09T16:59:02.457Z
+2,Bob,bob.new@example.com,Hyderabad,active,2024-01-02T08:00:00.000Z,U,,2026-03-09T17:05:38.281Z
+3,Carol,c@example.com,Delhi,inactive,2024-01-02T09:00:00.000Z,D,,2026-03-09T17:05:38.281Z
+4,Dave,d@example.com,Chennai,active,2024-01-02T09:30:00.000Z,I,,2026-03-09T17:05:38.281Z
