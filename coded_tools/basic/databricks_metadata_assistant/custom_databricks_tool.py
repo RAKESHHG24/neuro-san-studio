@@ -1,8 +1,16 @@
 import os
 from pathlib import Path
 
-from dotenv import load_dotenv
-from databricks.sdk import WorkspaceClient
+try:
+    from dotenv import load_dotenv
+except ModuleNotFoundError:  # pragma: no cover - fallback for lightweight test environments
+    def load_dotenv(*args, **kwargs):
+        return False
+
+try:
+    from databricks.sdk import WorkspaceClient
+except ModuleNotFoundError:  # pragma: no cover - fallback for lightweight test environments
+    WorkspaceClient = None
 
 
 def _load_env() -> None:
@@ -39,6 +47,8 @@ def _build_workspace_kwargs() -> dict:
 
 
 def get_workspace():
+    if WorkspaceClient is None:
+        raise RuntimeError("databricks-sdk is not installed")
     return WorkspaceClient(**_build_workspace_kwargs())
 
 

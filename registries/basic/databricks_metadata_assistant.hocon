@@ -70,7 +70,8 @@
                 "Schema_Agent",
                 "Table_Agent",
                 "Column_Agent",
-                "QueryExecutorAPI"
+                "QueryExecutorAPI",
+                "ExportResultsAPI"
             ]
         },
 
@@ -257,6 +258,37 @@
             },
 
             "class": "basic.databricks_metadata_assistant.query_executor.QueryExecutorTool"
+        },
+
+        {
+            "name": "ExportResultsAPI",
+
+            "function": {
+                "description": "Executes a SQL query and saves the results to a CSV or Excel file"
+
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "sql_query": {
+                            "type": "string",
+                            "description": "The SQL query to execute"
+                        },
+                        "output_format": {
+                            "type": "string",
+                            "description": "The export format: csv or excel"
+                        },
+                        "file_name": {
+                            "type": "string",
+                            "description": "Suggested output file name without extension"
+                        }
+                    },
+                    "required": [
+                        "sql_query"
+                    ]
+                }
+            },
+
+            "class": "basic.databricks_metadata_assistant.export_results.ExportResultsTool"
         }
     ]
 }
